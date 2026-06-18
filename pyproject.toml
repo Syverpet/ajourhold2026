@@ -64,3 +64,6 @@ validate-env = 'python -c "import sys, torch; print(f\"python: {sys.version.spli
 [build-system]
 build-backend = "hatchling.build"
 requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ml_ajourhold"]
