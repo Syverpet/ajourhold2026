@@ -1,0 +1,66 @@
+[project]
+name = "ml-ajourhold"
+description = ""
+readme = "README.md"
+authors = [
+  { name = "Willeke A'Campo", email = "willeke.acampo@miljodir.no" }
+]
+requires-python = ">=3.12,<3.13"
+
+[tool.pixi.workspace]
+name = "ml-ajourhold"
+channels = ["conda-forge"] # Base Conda packages are resolved from conda-forge.
+platforms = ["win-64", "linux-64"]
+channel-priority = "strict"
+requires-pixi = ">=0.40"
+
+# Packages installed from Conda-forge
+[tool.pixi.dependencies]
+python = "3.12.*" 
+ipykernel = "*" 
+geopandas = ">=1.1.3,<2" 
+rasterio = ">=1.4.3,<2" 
+shapely = ">=2.1.2,<3" 
+pyarrow = ">=20.0.0,<25"
+numpy = ">=2.4.6,<3" 
+pandas = ">=3.0.3,<4" 
+scipy = ">=1.17.1,<2" 
+scikit-learn = ">=1.9.0,<2" 
+xgboost = ">=3.2.0,<4" 
+
+# CPU-fallback env, pytorch is installed from conda-forge for the CPU environment to ensure a compatible
+# CPU-only PyTorch build is available without needing CUDA drivers).
+[tool.pixi.feature.cpu.dependencies]
+pytorch-cpu = "*" 
+
+# GPU-accelerated env
+# Packages installed from PyPI for the GPU environment to get the latest CUDA-accelerated builds 
+# directly from the PyTorch project (since conda-forge can lag behind the latest CUDA PyTorch releases). 
+[tool.pixi.feature.gpu.pypi-dependencies]
+torch = { version = "*", index = "https://download.pytorch.org/whl/cu132" } # PyPI wheel from the PyTorch CUDA 13.2 index for GPU acceleration; this repo uses the official CUDA wheels directly because conda-forge can lag newer CUDA PyTorch builds.
+torchvision = { version = "*", index = "https://download.pytorch.org/whl/cu132" } # PyPI wheel from the same PyTorch CUDA 13.2 index.
+lightning = ">=2.6.5, <3"
+cupy-cuda13x = ">=14.1.1, <15"
+
+[tool.pixi.feature.gpu.constraints]
+setuptools = "<82"
+
+# GPU driver must be compatible with CUDA 13.2 
+[tool.pixi.feature.gpu.system-requirements]
+cuda = "13.2"
+
+[tool.pixi.environments]
+cpu = ["cpu"]
+default = ["gpu"]
+
+# Tasks for setting up and validating the environments
+# - create Jupyter kernels for both GPU and CPU environments in Python notebooks
+# - validate that correct Python, PyTorch and CUDA version are installed and CUDA is availabe in the GPU
+[tool.pixi.tasks]
+install-kernel-gpu = 'python -m ipykernel install --user --name demo-conda-gpu --display-name "ml_gpu"'
+install-kernel-cpu = 'python -m ipykernel install --user --name demo-conda-cpu --display-name "ml_cpu"'
+validate-env = 'python -c "import sys, torch; print(f\"python: {sys.version.split()[0]}\"); print(f\"torch: {torch.__version__}\"); print(f\"cuda available: {torch.cuda.is_available()}\"); print(f\"cuda runtime: {torch.version.cuda}\")"'
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
