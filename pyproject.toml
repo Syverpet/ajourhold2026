@@ -27,6 +27,14 @@ pandas = ">=3.0.3,<4"
 scipy = ">=1.17.1,<2" 
 scikit-learn = ">=1.9.0,<2" 
 xgboost = ">=3.2.0,<4" 
+gdal = ">=3.10.3,<4"
+libgdal-arrow-parquet = ">=3.12.2,<4"
+libgdal-pg = ">=3.12.2,<4" 
+tqdm = ">=4.68.3,<5"
+pystac-client = ">=0.8"
+huggingface_hub = ">=0.27"
+psutil = ">=5.9"
+pyogrio = ">=0.9"
 
 # CPU-fallback env, pytorch is installed from conda-forge for the CPU environment to ensure a compatible
 # CPU-only PyTorch build is available without needing CUDA drivers).
